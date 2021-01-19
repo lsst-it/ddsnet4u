@@ -7,11 +7,11 @@ metadata:
     k8s.v1.cni.cncf.io/networks: kube-system/macvlan-conf
 spec:
   initContainers:
-  - name: ddsnet4u
-    image: lsstit/ddsnet4u
-    securityContext:
-      privileged: true
+    - name: ddsnet4u
+      image: lsstit/ddsnet4u
+      securityContext:
+        privileged: true
   containers:
-  - name: iperf
-    command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
-    image: jhoblitt/iperf
+    - name: iperf
+      command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+      image: jhoblitt/iperf
