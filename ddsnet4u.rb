@@ -55,12 +55,13 @@ conf = YAML.safe_load(File.read(conf_file))
 IFACE_NAME = conf['interface']
 raise('"interface" key missing from conf file') if IFACE_NAME.nil?
 
-subnets = conf['subnets']
+DDS_SUBNETS = conf['subnets']
+raise('"subnets" key missing from conf file') if DDS_SUBNETS.nil?
 
 # convert hash of prefix strings into array of hash w/ IPAddr objects
 # - input is a hash to prevent duplicates
 # - use an array so that we can sort it later on
-subnets = subnets.each_with_object([]) { |x, n| n << { IPAddr.new(x.first) => x.last } }
+subnets = DDS_SUBNETS.each_with_object([]) { |x, n| n << { IPAddr.new(x.first) => x.last } }
 
 puts "looking for IPs assigned to interface: #{IFACE_NAME}"
 foo = get_interface_ips(name: IFACE_NAME)
