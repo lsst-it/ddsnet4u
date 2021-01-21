@@ -64,8 +64,10 @@ raise('"subnets" key missing from conf file') if DDS_SUBNETS.nil?
 subnets = DDS_SUBNETS.each_with_object([]) { |x, n| n << { IPAddr.new(x.first) => x.last } }
 
 puts "looking for IPs assigned to interface: #{IFACE_NAME}"
-foo = get_interface_ips(name: IFACE_NAME)
-ip = ifaddr_to_ipaddr(addrs: foo).first
+iface_ips = get_interface_ips(name: IFACE_NAME)
+raise("interface #{IFACE_NAME} does not exist or has no IPv4 addresses assigned") if iface_ips.empty?
+
+ip = ifaddr_to_ipaddr(addrs: iface_ips).first
 puts "assuming IP is: #{ip}"
 
 # find all subnets which contain our ip
