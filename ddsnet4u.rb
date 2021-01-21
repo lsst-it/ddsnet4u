@@ -6,7 +6,6 @@ require 'ipaddr'
 require 'yaml'
 require 'net/ip'
 
-IFACE_NAME = 'eno1'
 DEFAULT_CONF_PATHS = [
   './ddsnet4u.yaml',
   "#{ENV['HOME']}/ddsnet4u.yaml",
@@ -52,6 +51,9 @@ conf_file = DEFAULT_CONF_PATHS.find { |x| File.exist?(x) and File.readable?(x) }
 raise("unable to find a conf file at these paths: #{DEFAULT_CONF_PATHS}") if conf_file.nil?
 
 conf = YAML.safe_load(File.read(conf_file))
+
+IFACE_NAME = conf['interface']
+raise('"interface" key missing from conf file') if IFACE_NAME.nil?
 
 subnets = conf['subnets']
 
