@@ -1,10 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'socket'
 require 'ipaddr'
-require 'yaml'
 require 'net/ip'
+require 'optparse'
+require 'socket'
+require 'yaml'
 
 DEFAULT_CONF_PATHS = [
   './ddsnet4u.yaml',
@@ -12,6 +13,23 @@ DEFAULT_CONF_PATHS = [
   '/usr/local/etc/ddsnet4u.yaml',
   '/etc/ddsnet4u/ddsnet4u.yaml'
 ].freeze
+
+options = { conf_paths: DEFAULT_CONF_PATHS }
+option_parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: ddsnet4u.rb [options]'
+  opts.separator ''
+  opts.separator 'Specifc options:'
+
+  opts.on('-c', '--config PATH', String) do |c|
+    options[:conf_paths] = [c]
+  end
+
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
+end
+option_parser.parse!
 
 def get_interface_ips(name:)
   # returns all address, including ipv6
@@ -47,8 +65,8 @@ def stringify_ipaddr(ipaddr:)
 end
 
 # find a readable conf file
-conf_file = DEFAULT_CONF_PATHS.find { |x| File.exist?(x) and File.readable?(x) }
-raise("unable to find a conf file at these paths: #{DEFAULT_CONF_PATHS}") if conf_file.nil?
+conf_file = options[:conf_paths].find { |x| File.exist?(x) and File.readable?(x) }
+raise("unable to find a conf file at these path(s): #{options[:conf_paths]}") if conf_file.nil?
 
 conf = YAML.safe_load(File.read(conf_file))
 
