@@ -137,6 +137,12 @@ current_routes.each { |x| puts " - #{x.prefix}" }
 inject_routes = required_routes.reject do |x|
   current_routes.any? { |i| i.prefix == x.prefix }
 end
+
+if inject_routes.empty?
+  puts 'no missing routes, nothing to do, exiting...'
+  exit 0
+end
+
 puts 'need to inject routes for:'
 inject_routes.each { |x| puts " - #{x.prefix}" }
 
@@ -154,4 +160,4 @@ inject_routes.each do |x|
   end
 end
 
-exit 1 if route_errors
+exit 1 unless route_errors.zero?
