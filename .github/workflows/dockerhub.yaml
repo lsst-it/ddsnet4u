@@ -2,8 +2,9 @@
 name: Publish to dockerhub
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*'
 
 jobs:
   push_to_registry:
