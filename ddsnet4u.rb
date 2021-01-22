@@ -24,6 +24,10 @@ option_parser = OptionParser.new do |opts|
     options[:conf_paths] = [c]
   end
 
+  opts.on('-n', '--[no-]noop', 'Do not change routing table') do |n|
+    options[:noop] = [n]
+  end
+
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
     exit
@@ -135,6 +139,8 @@ inject_routes = required_routes.reject do |x|
 end
 puts 'need to inject routes for:'
 inject_routes.each { |x| puts " - #{x.prefix}" }
+
+exit 0 if options[:noop]
 
 # inject routes
 route_errors = 0
