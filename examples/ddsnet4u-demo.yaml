@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ddsnet4u-demo1
+  annotations:
+    k8s.v1.cni.cncf.io/networks: kube-system/macvlan-conf
+spec:
+  initContainers:
+    - name: ddsnet4u
+      image: lsstit/ddsnet4u
+      securityContext:
+        privileged: true
+  containers:
+    - name: demo
+      command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+      image: lsstit/ddsnet4u

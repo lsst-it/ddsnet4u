@@ -24,7 +24,7 @@ spec:
         privileged: true
 ```
 
-See [examples/multus-routes.yaml](examples/multus-routes.yaml) for a complete example.
+See [examples/ddsnet4u-demo.yaml](examples/ddsnet4u-demo.yaml) for a complete example.
 
 Why this exists
 ---------------

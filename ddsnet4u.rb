@@ -152,6 +152,7 @@ exit 0 if options[:noop]
 route_errors = 0
 inject_routes.each do |x|
   begin
+    puts "injecting route for #{x.prefix}"
     current_routes.add(x)
   rescue StandardError => e
     route_errors += 1
