@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: multus-routes1
+  name: ddsnet4u-demo1
   annotations:
     k8s.v1.cni.cncf.io/networks: kube-system/macvlan-conf
 spec:
@@ -12,6 +12,6 @@ spec:
       securityContext:
         privileged: true
   containers:
-    - name: iperf
+    - name: demo
       command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
-      image: jhoblitt/iperf
+      image: lsstit/ddsnet4u
