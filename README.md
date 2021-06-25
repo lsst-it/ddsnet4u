@@ -19,7 +19,7 @@ permissions, the `initContainer` **must** be run as `priviledged`.
 spec:
   initContainers:
     - name: ddsnet4u
-      image: lsstit/ddsnet4u
+      image: lsstit/ddsnet4u:latest
       securityContext:
         privileged: true
 ```
