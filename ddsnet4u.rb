@@ -175,14 +175,12 @@ exit 0 if options[:noop]
 # inject routes
 route_errors = 0
 inject_routes.each do |x|
-  begin
-    puts "injecting route for #{x.prefix}"
-    current_routes.add(x)
-  rescue StandardError => e
-    route_errors += 1
-    puts "failed to inject route for #{x.prefix}"
-    puts e
-  end
+  puts "injecting route for #{x.prefix}"
+  current_routes.add(x)
+rescue StandardError => e
+  route_errors += 1
+  puts "failed to inject route for #{x.prefix}"
+  puts e
 end
 
 exit 1 unless route_errors.zero?
