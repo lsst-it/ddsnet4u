@@ -65,9 +65,9 @@ networking interfaces. These are the currently available options:
   IP allocation.
 
 * [`dhcp`](https://www.cni.dev/plugins/ipam/dhcp/) is able to obtain a per pod
-  DHCP lease from an external DHCP server.  There is no option to use the DHCP
-  provided gateway as the default route nor is there the ability to inject
-  additional static routes
+  DHCP lease from an external DHCP server.  There is no is there the ability to
+  inject additional static routes. See
+  [containernetworking/plugins#640](https://github.com/containernetworking/plugins/issues/640)
 
 The `dhcp` plugin best fits the use case but a solution for managing additional
 static routes was needed.  Ideally, such support would be added to the upstream
