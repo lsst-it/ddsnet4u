@@ -15,6 +15,6 @@ jobs:
         with:
           ruby-version: 2.7.2
       - name: Install Rubocop
-        run: gem install rubocop
+        run: bundle install
       - name: Check code
         run: rubocop
