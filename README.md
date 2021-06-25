@@ -26,6 +26,14 @@ spec:
 
 See [examples/ddsnet4u-demo.yaml](examples/ddsnet4u-demo.yaml) for a complete example.
 
+Docker Images
+-------------
+
+Prebuilt docker images are published to
+[`lsstit/ddsnet4u`](https://hub.docker.com/repository/registry-1.docker.io/lsstit/ddsnet4u/tags?page=1&ordering=last_updated).
+**Note that Rubin Observatory specific configuration is baked into these
+images.**
+
 Why this exists
 ---------------
 
