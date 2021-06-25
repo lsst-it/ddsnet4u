@@ -19,12 +19,20 @@ permissions, the `initContainer` **must** be run as `priviledged`.
 spec:
   initContainers:
     - name: ddsnet4u
-      image: lsstit/ddsnet4u
+      image: lsstit/ddsnet4u:latest
       securityContext:
         privileged: true
 ```
 
 See [examples/ddsnet4u-demo.yaml](examples/ddsnet4u-demo.yaml) for a complete example.
+
+Docker Images
+-------------
+
+Prebuilt docker images are published to
+[`lsstit/ddsnet4u`](https://hub.docker.com/repository/registry-1.docker.io/lsstit/ddsnet4u/tags?page=1&ordering=last_updated).
+**Note that Rubin Observatory specific configuration is baked into these
+images.**
 
 Why this exists
 ---------------
@@ -57,9 +65,9 @@ networking interfaces. These are the currently available options:
   IP allocation.
 
 * [`dhcp`](https://www.cni.dev/plugins/ipam/dhcp/) is able to obtain a per pod
-  DHCP lease from an external DHCP server.  There is no option to use the DHCP
-  provided gateway as the default route nor is there the ability to inject
-  additional static routes
+  DHCP lease from an external DHCP server.  There is no is there the ability to
+  inject additional static routes. See
+  [containernetworking/plugins#640](https://github.com/containernetworking/plugins/issues/640)
 
 The `dhcp` plugin best fits the use case but a solution for managing additional
 static routes was needed.  Ideally, such support would be added to the upstream

@@ -68,6 +68,23 @@ def stringify_ipaddr(ipaddr:)
   "#{ipaddr}/#{ipaddr.prefix}"
 end
 
+# convert hash of prefix strings into array of hash w/ IPAddr objects
+# - input is a hash to prevent duplicates
+# - use an array so that we can sort it later on
+def prefix2ipaddr(subnets)
+  subnets.each_with_object([]) { |x, n| n << { IPAddr.new(x.first) => x.last } }
+end
+
+def parse_vrf(vrf)
+  vrf.each_with_object({}) do |k, o|
+    (vrf_name, vrf_data) = k
+    subnets = vrf_data['subnets']
+    raise('"subnets" key missing from conf file') if subnets.nil?
+
+    o[vrf_name] = { subnets: prefix2ipaddr(subnets) }
+  end
+end
+
 # find a readable conf file
 conf_file = options[:conf_paths].find { |x| File.exist?(x) and File.readable?(x) }
 raise("unable to find a conf file at these path(s): #{options[:conf_paths]}") if conf_file.nil?
@@ -77,13 +94,10 @@ conf = YAML.safe_load(File.read(conf_file))
 IFACE_NAME = conf['interface']
 raise('"interface" key missing from conf file') if IFACE_NAME.nil?
 
-DDS_SUBNETS = conf['subnets']
-raise('"subnets" key missing from conf file') if DDS_SUBNETS.nil?
+DDS_VRF = conf['vrf']
+raise('"vrf" key missing from conf file') if DDS_VRF.nil?
 
-# convert hash of prefix strings into array of hash w/ IPAddr objects
-# - input is a hash to prevent duplicates
-# - use an array so that we can sort it later on
-subnets = DDS_SUBNETS.each_with_object([]) { |x, n| n << { IPAddr.new(x.first) => x.last } }
+vrf = parse_vrf(DDS_VRF)
 
 puts "looking for IPs assigned to interface: #{IFACE_NAME}"
 iface_ips = get_interface_ips(name: IFACE_NAME)
@@ -92,8 +106,18 @@ raise("interface #{IFACE_NAME} does not exist or has no IPv4 addresses assigned"
 ip = ifaddr_to_ipaddr(addrs: iface_ips).first
 puts "assuming IP is: #{ip}"
 
-# find all subnets which contain our ip
-matching_subs = subnets.filter { |x| x.keys.first.include?(ip) }
+matching_subs = nil
+vrf_name = nil
+
+# see if any vrf has a prefix which matches our interface's ip
+vrf.each do |name, data|
+  vrf_name = name
+  # find all subnets which contain our ip
+  matching_subs = data[:subnets].filter { |x| x.keys.first.include?(ip) }
+  break unless matching_subs.empty?
+end
+
+puts "assuming vrf is: #{vrf_name}"
 
 # exit 0 if there are no matching subnets as this might be a k8s cluster on
 # which nothing is needed
@@ -114,7 +138,7 @@ puts "assuming DDS gateway is: #{mygw}"
 # remove the interface's subnet from the list of all subnets and routes will be
 # needed for what remains -- this will work only if there are not other
 # interfaces/ips in these subnets
-required_subnets = subnets.reject { |x| x.keys.first == mysub.keys.first }
+required_subnets = vrf[vrf_name][:subnets].reject { |x| x.keys.first == mysub.keys.first }
 
 required_routes = required_subnets.collect do |x|
   Net::IP::Route.new(
@@ -151,14 +175,12 @@ exit 0 if options[:noop]
 # inject routes
 route_errors = 0
 inject_routes.each do |x|
-  begin
-    puts "injecting route for #{x.prefix}"
-    current_routes.add(x)
-  rescue StandardError => e
-    route_errors += 1
-    puts "failed to inject route for #{x.prefix}"
-    puts e
-  end
+  puts "injecting route for #{x.prefix}"
+  current_routes.add(x)
+rescue StandardError => e
+  route_errors += 1
+  puts "failed to inject route for #{x.prefix}"
+  puts e
 end
 
 exit 1 unless route_errors.zero?
